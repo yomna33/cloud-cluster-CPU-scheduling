@@ -6,7 +6,7 @@ public class Process {
 
     public int tier =1; 
     public int currentPriority ;
-    public int waitingTime;
+    public int waitingSince; 
 
     public Process(String name , int arrivalTime , int burstTime , int priority){
         this.name = name;
