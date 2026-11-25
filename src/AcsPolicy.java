@@ -1,6 +1,8 @@
 import java.util.*;
 
 public class AcsPolicy implements Policy {
+
+    private static final int AGING = 4; //improve prio by 1 per 4 times
     private final int quantum; //round robin quantum
     private final Deque<Process> tier1 = new ArrayDeque<>(); //FIFO for round robin
     private final List<Process> tier2 = new ArrayList<>(); //demoted processes
@@ -17,7 +19,24 @@ public class AcsPolicy implements Policy {
 
     @Override
     public Process pickNext(int time) {
-        return tier1.pollFirst(); //pick the first process in the queue
+        if (!tier1.isEmpty()) {
+            return tier1.pollFirst(); //pick the first process in the queue
+        }
+        if(tier2.isEmpty()) {
+            return null;
+        }
+        applyAging(time); //apply aging to tier 2 processes
+
+        Process highestPrio = tier2.get(0);
+        for (Process p : tier2) {
+            if (p.currentPriority < highestPrio.currentPriority || (p.currentPriority == highestPrio.currentPriority && p.arrivalTime < highestPrio.arrivalTime)) {
+                highestPrio = p;
+            }
+        }
+
+        tier2.remove(highestPrio);
+        return highestPrio;
+
     }
 
     @Override
@@ -40,6 +59,12 @@ public class AcsPolicy implements Policy {
     public String snapshot() {
         return "Tier 1: " + format(tier1) + " | Tier 2: " + format(tier2);  
 
+    }
+
+    private void applyAging(int time) {
+        for (Process p : tier2) {
+            p.currentPriority = p.priority - (time - p.waitingSince) / AGING; //dec priority based on waiting time
+        }
     }
 
     private String format(Collection<Process> c) {
