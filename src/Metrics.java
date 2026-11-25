@@ -30,9 +30,4 @@ public class Metrics {
         System.out.printf("Average Turnaround Time: %.2f\n", avgTurnaroundTime(processes));
         System.out.printf("Average Waiting Time: %.2f\n", avgWaitingTime(processes));
     }
-
-
-
-    
-
 }
