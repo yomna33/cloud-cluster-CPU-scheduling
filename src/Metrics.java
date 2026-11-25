@@ -22,10 +22,10 @@ public class Metrics {
         List<Process> sorted = new ArrayList<>(processes);
         sorted.sort(Comparator.comparing(p -> p.name));
 
-        System.out.println("Process\tArrival\tFinish\tTurnaround\tWaiting");
+        System.out.println("Process\tArrival\tFinish\tTurnaround\tWaiting\tResponse");
         for (Process p : sorted) {
-            System.out.printf("%s\t%d\t%d\t%d\t%d\n",
-                    p.name, p.arrivalTime, p.finishTime, p.getTurnaroundTime(), p.getWaitingTime());
+            System.out.printf("%s\t%d\t%d\t%d\t%d\t%d\n",
+                    p.name, p.arrivalTime, p.finishTime, p.getTurnaroundTime(), p.getWaitingTime(), p.getResponseTime());
         }
         System.out.printf("Average Turnaround Time: %.2f\n", avgTurnaroundTime(processes));
         System.out.printf("Average Waiting Time: %.2f\n", avgWaitingTime(processes));

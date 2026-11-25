@@ -56,7 +56,8 @@ public class AcsPolicy implements Policy {
     }
 
     @Override
-    public String snapshot() {
+    public String snapshot(int time) {
+        applyAging(time);
         return "Tier 1: " + format(tier1) + " | Tier 2: " + format(tier2);  
 
     }

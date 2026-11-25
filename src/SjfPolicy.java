@@ -39,7 +39,7 @@ public class SjfPolicy implements Policy {
     }
 
     @Override
-    public String snapshot() {
+    public String snapshot(int time) {
         if (queue.isEmpty()) { return "[empty]";}
          StringBuilder sb = new StringBuilder("[");
         for (Process p : queue) {

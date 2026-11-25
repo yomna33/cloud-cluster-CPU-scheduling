@@ -10,14 +10,16 @@ public class Simulator {
     private int sec = 0;
     private Process currentProcess = null;
     private Process nextProcess = null;
+    private Process lastProcess = null; // process that was just preempted (no CS if it is picked again)
     private int sliceUsed = 0;
     private boolean processed = false;
     private String queueState;
-
-    public Simulator(List<Process> processes, int cs, Policy policy) {
+    private boolean verbose;
+    public Simulator(List<Process> processes, int cs, Policy policy, boolean verbose) {
         this.policy = policy;
         this.originalList = new ArrayList<>(processes);
         this.cs = cs;
+        this.verbose = verbose;
     }
 
     public List<Process> runLoop() {
@@ -55,19 +57,22 @@ public class Simulator {
                 currentProcess = null;
             } else if (policy.shouldPreempt(currentProcess, sliceUsed, sec)) {
                 policy.onPreempt(currentProcess, sec);
+                lastProcess = currentProcess;
                 currentProcess = null;
             }
         }
     }
 
     private void admitNext() {
-        queueState = policy.snapshot();
+        queueState = policy.snapshot(sec);
         if (currentProcess != null || nextProcess != null)
             return;
         Process p = policy.pickNext(sec);
         if (p == null)
             return;
-        if (!processed || cs == 0) {
+        boolean sameProcess = (p == lastProcess);
+        lastProcess = null;
+        if (!processed || cs == 0 || sameProcess) {
             currentProcess = p;
             sliceUsed = 0;
             if (p.firstStartTime < 0)
@@ -81,6 +86,7 @@ public class Simulator {
     }
 
     private void printR() {
+        if(!verbose) return;
         String pName;
         if (currentProcess != null) {
             pName = currentProcess.name;
